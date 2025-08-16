@@ -24,8 +24,11 @@ exports.addStudent = (req, res) => {
 
   db.query(query, values, (err, result) => {
     if (err) {
+      if (err.code === 'ER_DUP_ENTRY') {
+        return res.status(409).json({ error: 'A student with this roll_number already exists' });
+      }
       return res.status(500).json({ error: err.message });
     }
-    res.json({ message: '✅ Student added successfully!' });
+    res.json({ message: '✅ Student added successfully!', id: result?.insertId });
   });
 };

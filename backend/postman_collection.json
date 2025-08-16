@@ -1,0 +1,193 @@
+{
+  "info": {
+    "name": "Smart Student API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "GET /auth/test",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/auth/test"
+          }
+        },
+        {
+          "name": "POST /auth/register (teacher)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Teacher One\",\n  \"email\": \"teacher@example.com\",\n  \"password\": \"secret123\",\n  \"role\": \"teacher\"\n}"
+            },
+            "url": "{{base_url}}/auth/register"
+          }
+        },
+        {
+          "name": "POST /auth/login (captures token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"teacher@example.com\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": "{{base_url}}/auth/login"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const data = pm.response.json();",
+                  "  if (data && data.token) {",
+                  "    pm.collectionVariables.set('token', data.token);",
+                  "    pm.test('Token captured', function () { pm.expect(data.token).to.be.a('string'); });",
+                  "  } else {",
+                  "    pm.test('Token not in response', function () { pm.expect.fail('No token in response'); });",
+                  "  }",
+                  "} catch (e) { pm.test('Invalid JSON response', function () { pm.expect.fail(e.message); }); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/request-password-reset (email)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"teacher@example.com\"\n}"
+            },
+            "url": "{{base_url}}/auth/request-password-reset"
+          }
+        },
+        {
+          "name": "POST /auth/request-password-reset (phone)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+10000000000\"\n}"
+            },
+            "url": "{{base_url}}/auth/request-password-reset"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "GET /students",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/students"
+          }
+        },
+        {
+          "name": "POST /students (create)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alice\",\n  \"roll_number\": \"R001\",\n  \"class\": \"10\",\n  \"section\": \"A\"\n}"
+            },
+            "url": "{{base_url}}/students"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Attendance (auth required)",
+      "item": [
+        {
+          "name": "POST /attendance (add)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": 1,\n  \"date\": \"2025-01-01\",\n  \"status\": \"present\"\n}"
+            },
+            "url": "{{base_url}}/attendance"
+          }
+        },
+        {
+          "name": "GET /attendance?student_id=1",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/attendance?student_id=1"
+          }
+        },
+        {
+          "name": "PUT /attendance/:id (teacher only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"late\"\n}"
+            },
+            "url": "{{base_url}}/attendance/1"
+          }
+        },
+        {
+          "name": "DELETE /attendance/:id (teacher only)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/attendance/1"
+          }
+        }
+      ]
+    }
+  ]
+}
+
+
+

@@ -11,6 +11,9 @@ router.post('/', authenticate, attendanceController.addAttendance);
 // ✅ Anyone (with valid token) can view attendance
 router.get('/', authenticate, attendanceController.getAttendance);
 
+// ✅ Mark attendance for multiple students (used by frontend)
+router.post('/mark', authenticate, isTeacher, attendanceController.markAttendance);
+
 // 🔐 Only authenticated teachers can update attendance
 router.put('/:id', authenticate, isTeacher, attendanceController.updateAttendance);
 
