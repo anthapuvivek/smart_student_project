@@ -47,6 +47,15 @@ const signup = async (req, res) => {
 
       res.status(201).json({ 
         message: 'User created successfully',
+        token: jwt.sign(
+          { 
+            id: result.insertId, 
+            email,
+            role 
+          },
+          JWT_SECRET,
+          { expiresIn: '24h' }
+        ),
         user: {
           id: result.insertId,
           name,
