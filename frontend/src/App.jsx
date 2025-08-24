@@ -1,85 +1,96 @@
-import { Routes, Route, Navigate, Link } from 'react-router-dom';
-import loginPage from './pages/loginPage';
-import signupPage from './pages/signupPage';
-import DashboardPage from './pages/DashboardPage';
-import StudentPage from './pages/StudentPage';
-import AttendancePage from './pages/AttendancePage';
+import React from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/Protectedroute';
-import { useAuthContext } from './context/Authcontext';
+import Layout from './components/layout/Layout';
 
-function Nav() {
-  const { user, logout } = useAuthContext();
+// Auth Pages
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 
-  return (
-    <nav className="p-4 border-b flex gap-4 items-center">
-      <Link to="/dashboard" className="font-semibold">Smart Student</Link>
+// Student Pages
+import OverallAttendancePage from './pages/student/OverallAttendancePage';
+import StudentDashboardPage from './pages/student/StudentDashboardPage';
+import StudentMarksPage from './pages/student/StudentMarksPage';
+import TodayAttendancePage from './pages/student/TodayAttendancePage';
 
-      <div className="flex gap-3">
-        {user && (user.role === 'teacher' || user.role === 'admin') && (
-          <Link to="/students">Students</Link>
-        )}
-        {user && user.role === 'teacher' && (
-          <Link to="/attendance">Attendance</Link>
-        )}
-      </div>
+// Teacher Pages
+import TakeAttendancePage from './pages/teacher/TakeAttendancePage';
+import TeacherDashboardPage from './pages/teacher/TeacherDashboardPage';
+import TeacherMarksAllotmentPage from './pages/teacher/TeacherMarksAllotmentPage';
+import TeacherTimetablePage from './pages/teacher/TeacherTimetablePage';
 
-      <div className="ml-auto flex gap-2 items-center">
-        {user ? (
-          <>
-            <span className="text-sm">Hi, {user.name} ({user.role})</span>
-            <button
-              onClick={logout}
-              className="px-3 py-1 border rounded hover:bg-gray-100"
-            >
-              Logout
-            </button>
-          </>
-        ) : (
-          <Link to="/login" className="px-3 py-1 border rounded">Login</Link>
-        )}
-      </div>
-    </nav>
-  );
-}
+// Admin Pages
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AdminStudentOverviewPage from './pages/admin/AdminStudentOverviewPage';
+import AdminTeacherOverviewPage from './pages/admin/AdminTeacherOverviewPage';
+import AdminTimetablePage from './pages/admin/AdminTimetablePage';
 
 export default function App() {
   return (
-    <div className="min-h-screen">
-      <Nav />
-      <div className="p-4">
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route path="/login" element={<loginPage />} />
-          <Route path="/signup" element={<signupPage />} />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
-          <Route
-            path="/dashboardPage"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
+        {/* Protected Student Routes */}
+        <Route
+          path="/student/*"
+          element={
+            <ProtectedRoute roles={['student']}>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/student/dashboard" />} />
+                  <Route path="/dashboard" element={<StudentDashboardPage />} />
+                  <Route path="/today-attendance" element={<TodayAttendancePage />} />
+                  <Route path="/overall-attendance" element={<OverallAttendancePage />} />
+                  <Route path="/marks" element={<StudentMarksPage />} />
+                </Routes>
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/students"
-            element={
-              <ProtectedRoute roles={['teacher', 'admin']}>
-                <studentsPage />
-              </ProtectedRoute>
-            }
-          />
+        {/* Protected Teacher Routes */}
+        <Route
+          path="/teacher/*"
+          element={
+            <ProtectedRoute roles={['teacher']}>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/teacher/dashboard" />} />
+                  <Route path="/dashboard" element={<TeacherDashboardPage />} />
+                  <Route path="/take-attendance" element={<TakeAttendancePage />} />
+                  <Route path="/timetable" element={<TeacherTimetablePage />} />
+                  <Route path="/marks-allotment" element={<TeacherMarksAllotmentPage />} />
+                </Routes>
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
-          <Route
-            path="/attendance"
-            element={
-              <ProtectedRoute roles={['teacher']}>
-                <AttendancePage />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </div>
+        {/* Protected Admin Routes */}
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/admin/dashboard" />} />
+                  <Route path="/dashboard" element={<AdminDashboardPage />} />
+                  <Route path="/student-overview" element={<AdminStudentOverviewPage />} />
+                  <Route path="/teacher-overview" element={<AdminTeacherOverviewPage />} />
+                  <Route path="/timetable" element={<AdminTimetablePage />} />
+                </Routes>
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/login" />} />
+      </Routes>
     </div>
   );
 }

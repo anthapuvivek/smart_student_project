@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api', // Use proxy instead of hardcoded localhost:5000
+  baseURL: '', // Use relative URLs to work with both /api and /auth
   headers: {
     'Content-Type': 'application/json',
   },
